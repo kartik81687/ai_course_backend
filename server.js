@@ -25,8 +25,8 @@ app.use(cors({
         'http://localhost:5173',
         'https://your-frontend-domain.vercel.app',
         'https://your-frontend-domain.vercel.com',
-        'https://www.smartcourseai.co/',
-        "https://ai-course-frontend.vercel.app/"
+        'https://www.smartcourseai.co',
+        "https://ai-course-frontend.vercel.app"
     ],
     credentials: true
 }));
