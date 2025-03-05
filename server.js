@@ -19,38 +19,10 @@ const flw = new Flutterwave(process.env.FLUTTERWAVE_PUBLIC_KEY, process.env.FLUT
 
 //INITIALIZE
 const app = express();
-app.use(cors({
-    origin: [
-        'http://localhost:3000',
-        'http://localhost:5173',
-        'https://your-frontend-domain.vercel.app',
-        'https://your-frontend-domain.vercel.com',
-        'https://www.smartcourseai.co',
-        "https://ai-course-frontend.vercel.app"
-    ],
-    credentials: true
-}));
+app.use(cors());
+const PORT = process.env.PORT;
 app.use(bodyParser.json());
-const PORT = process.env.PORT || 5000;
-
-// MongoDB Connection
-mongoose.connect(process.env.MONGODB_URI, { 
-    useNewUrlParser: true, 
-    useUnifiedTopology: true 
-}).then(() => {
-    console.log('Connected to MongoDB successfully');
-    // Start server after successful database connection
-    app.listen(PORT, () => {
-        console.log(`Server is running on port ${PORT}`);
-    });
-}).catch((err) => {
-    console.error('MongoDB connection error:', err);
-    process.exit(1);
-});
-
-const db = mongoose.connection;
-db.on('error', console.error.bind(console, 'MongoDB connection error:'));
-
+mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true });
 const transporter = nodemailer.createTransport({
     host: 'smtp.gmail.com',
     port: 465,
@@ -1477,24 +1449,7 @@ app.post('/api/contact', async (req, res) => {
 app.post('/api/dashboard', async (req, res) => {
     const users = await User.estimatedDocumentCount();
     const courses = await Course.estimatedDocumentCount();
-    let admin = await Admin.findOne({ type: 'main' });
-    
-    // Create initial admin if none exists
-    if (!admin) {
-        admin = new Admin({
-            email: process.env.EMAIL,
-            mName: process.env.COMPANY,
-            type: 'main',
-            total: 0,
-            terms: '',
-            privacy: '',
-            cancel: '',
-            refund: '',
-            billing: ''
-        });
-        await admin.save();
-    }
-    
+    const admin = await Admin.findOne({ type: 'main' });
     const total = admin.total;
     const monthlyPlanCount = await User.countDocuments({ type: process.env.MONTH_TYPE });
     const yearlyPlanCount = await User.countDocuments({ type: process.env.YEAR_TYPE });
@@ -2363,4 +2318,9 @@ app.post('/api/deleteuser', async (req, res) => {
     } catch (error) {
         return res.json({ success: false, message: 'Internal Server Error' });
     }
+});
+
+//LISTEN
+app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
 });
