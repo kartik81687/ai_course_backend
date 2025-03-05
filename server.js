@@ -331,7 +331,7 @@ app.post('/api/prompt', async (req, res) => {
         },
     ];
 
-    const model = genAI.getGenerativeModel({ model: "gemini-pro", safetySettings });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash", safetySettings });
 
     const prompt = promptString;
 
